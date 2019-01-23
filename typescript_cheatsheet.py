@@ -58,18 +58,59 @@ FILES = [
     File('lib/lib.webworker.d.ts', 'Web Worker'),
     File('lib/lib.webworker.importscripts.d.ts', 'Web Worker Import Scripts'),
 ]
+
 BUILTINS = [
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#abstract-classes"><code>abstract</code> (w/ classes)</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#any"><code>any</code></a></li>',
-    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#array">Array</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#array"><code>Array</code> (<code>[]</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions"><code>as</code> (type assertions)</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#boolean"><code>boolean</code></a></li>',
-    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#enum"><code>enum</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#class-types">Class types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html">Classes</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#conditional-types">Conditional types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions">Discriminated unions</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/enums.html"><code>enum</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#predefined-conditional-types"><code>Exclude&lt;T, U&gt;</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#extending-interfaces"><code>extends</code> (w/ interfaces)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#predefined-conditional-types"><code>Extract&lt;T, U&gt;</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#function-types">Function types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/functions.html">Functions</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/generics.html">Generics (<code>&lt;&gt;</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#hybrid-types">Hybrid types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types"><code>in</code> operator</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types">Index types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#indexable-types">Indexable types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-inference-in-conditional-types"><code>infer</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#instanceof-type-guards"><code>instanceof</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#predefined-conditional-types"><code>InstanceType&lt;T&gt;</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html"><code>interface</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#intersection-types">Intersection types (<code>&amp;</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards"><code>is</code> (type predicate)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types"><code>keyof</code> index type query operator</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types">Mapped types</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#never"><code>never</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#predefined-conditional-types"><code>NonNullable&lt;T&gt;</code></a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#null-and-undefined"><code>null</code></a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#number"><code>number</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#numeric-literal-types">Numeric literal types</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#object"><code>object</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#optional-properties">Optional properties (<code>?</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#understanding-private"><code>private</code> (w/ classes)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#understanding-protected"><code>protected</code> (w/ classes)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#public-private-and-protected-modifiers"><code>public</code> (w/ classes)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#readonly-modifier"><code>readonly</code> (w/ classes)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/interfaces.html#readonly-properties"><code>readonly</code> (w/ interfaces)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#predefined-conditional-types"><code>ReturnType&lt;T&gt;</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#enum-member-types">Singleton types</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#string"><code>string</code></a></li>',
-    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#tuple">Tuple</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#string-literal-types">String literal types</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#tuple">Tuples</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-aliases"><code>type</code> aliases</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#type-assertions">Type assertions (<code>&lt;&gt;</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#typeof-type-guards"><code>typeof</code></a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#null-and-undefined"><code>undefined</code></a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/advanced-types.html#union-types">Union types (<code>|</code> syntax)</a></li>',
+    '<li><a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-0.html#new-unknown-top-type"><code>unknown</code></a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#void"><code>void</code></a></li>',
 ]
 
@@ -175,6 +216,9 @@ def write_introduction_paragraph(fout, version):
     fout.write('The script to generate this list is \n')
     fout.write('<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n')
     fout.write('Fixes welcome.\n')
+    fout.write('See also my\n')
+    fout.write('<a href="/flow-type-cheat-sheet/latest/">Flow type cheat sheet</a>\n')
+    fout.write('and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n')
     fout.write('</p>\n\n')
 
 
@@ -197,7 +241,7 @@ def write_list_of_versions(fout, this_version):
 
 
 def write_table_of_contents(fout):
-    lines = ['<li><a href="#builtins">Built-in types</a></li>'] + [
+    lines = ['<li><a href="#builtins">Built-ins</a></li>'] + [
         f'<li><a href="#{filepath}">{heading}</a></li>\n'
         for filepath, heading in FILES]
     write_panel_with_3_columns(
@@ -211,7 +255,7 @@ def write_builtins_panel(fout):
     write_panel_with_3_columns(
         fout,
         BUILTINS,
-        '<h4 id="builtins">Built-in Types</h4>',
+        '<h4 id="builtins">Built-ins</h4>',
     )
 
 
