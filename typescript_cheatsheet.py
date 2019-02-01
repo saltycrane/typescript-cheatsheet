@@ -8,43 +8,41 @@ from cheatsheet import File, make_cheatsheet
 ################
 # constants
 ################
-OUTPUT_TEMPLATE = 'dist/typescript/{version}.html'
-GITHUB_BASE_URL = 'https://github.com/Microsoft/TypeScript/tree'
-GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/Microsoft/TypeScript'
-PUBLISH_BASE_URL = '/typescript-cheat-sheet'
-VERSIONS = [
-    'v3.2.4',
-]
+OUTPUT_TEMPLATE = "dist/typescript/{version}.html"
+GITHUB_BASE_URL = "https://github.com/Microsoft/TypeScript/tree"
+GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/Microsoft/TypeScript"
+PUBLISH_BASE_URL = "/typescript-cheat-sheet"
+VERSIONS = ["v3.2.4"]
 FILES = [
-    File('lib/lib.dom.d.ts', 'DOM'),
-    File('lib/lib.dom.iterable.d.ts', 'DOM Iterable'),
-    File('lib/lib.es5.d.ts', 'ES5'),
-    File('lib/lib.es2015.collection.d.ts', 'ES2015 Collection'),
-    File('lib/lib.es2015.core.d.ts', 'ES2015 Core'),
-    File('lib/lib.es2015.generator.d.ts', 'ES2015 Generator'),
-    File('lib/lib.es2015.iterable.d.ts', 'ES2015 Iterable'),
-    File('lib/lib.es2015.promise.d.ts', 'ES2015 Promise'),
-    File('lib/lib.es2015.proxy.d.ts', 'ES2015 Proxy'),
-    File('lib/lib.es2015.reflect.d.ts', 'ES2015 Reflect'),
-    File('lib/lib.es2015.symbol.d.ts', 'ES2015 Symbol'),
-    File('lib/lib.es2015.symbol.wellknown.d.ts', 'ES2015 Symbol Well Known'),
-    File('lib/lib.es2016.array.include.d.ts', 'ES2016 Array Include'),
-    File('lib/lib.es2017.intl.d.ts', 'ES2017 Intl'),
-    File('lib/lib.es2017.object.d.ts', 'ES2017 Object'),
-    File('lib/lib.es2017.sharedmemory.d.ts', 'ES2017 Shared Memory'),
-    File('lib/lib.es2017.string.d.ts', 'ES2017 String'),
-    File('lib/lib.es2017.typedarrays.d.ts', 'ES2017 Typed Arrays'),
-    File('lib/lib.es2018.intl.d.ts', 'ES2018 Intl'),
-    File('lib/lib.es2018.promise.d.ts', 'ES2018 Promise'),
-    File('lib/lib.es2018.regexp.d.ts', 'ES2018 Regexp'),
-    File('lib/lib.esnext.array.d.ts', 'ESNext Array'),
-    File('lib/lib.esnext.asynciterable.d.ts', 'ESNext Async Iterable'),
-    File('lib/lib.esnext.bigint.d.ts', 'ESNext Big Int'),
-    File('lib/lib.esnext.intl.d.ts', 'ESNext Intl'),
-    File('lib/lib.esnext.symbol.d.ts', 'ESNext Symbol'),
-    File('lib/lib.scripthost.d.ts', 'Script Host'),
-    File('lib/lib.webworker.d.ts', 'Web Worker'),
-    File('lib/lib.webworker.importscripts.d.ts', 'Web Worker Import Scripts'),
+    File("lib/lib.dom.d.ts", "DOM"),
+    File("lib/lib.dom.iterable.d.ts", "DOM Iterable"),
+    File("lib/lib.es5.d.ts", "ES5"),
+    File("lib/lib.es2015.collection.d.ts", "ES2015 Collection"),
+    File("lib/lib.es2015.core.d.ts", "ES2015 Core"),
+    File("lib/lib.es2015.generator.d.ts", "ES2015 Generator"),
+    File("lib/lib.es2015.iterable.d.ts", "ES2015 Iterable"),
+    File("lib/lib.es2015.promise.d.ts", "ES2015 Promise"),
+    File("lib/lib.es2015.proxy.d.ts", "ES2015 Proxy"),
+    File("lib/lib.es2015.reflect.d.ts", "ES2015 Reflect"),
+    File("lib/lib.es2015.symbol.d.ts", "ES2015 Symbol"),
+    File("lib/lib.es2015.symbol.wellknown.d.ts", "ES2015 Symbol Well Known"),
+    File("lib/lib.es2016.array.include.d.ts", "ES2016 Array Include"),
+    File("lib/lib.es2017.intl.d.ts", "ES2017 Intl"),
+    File("lib/lib.es2017.object.d.ts", "ES2017 Object"),
+    File("lib/lib.es2017.sharedmemory.d.ts", "ES2017 Shared Memory"),
+    File("lib/lib.es2017.string.d.ts", "ES2017 String"),
+    File("lib/lib.es2017.typedarrays.d.ts", "ES2017 Typed Arrays"),
+    File("lib/lib.es2018.intl.d.ts", "ES2018 Intl"),
+    File("lib/lib.es2018.promise.d.ts", "ES2018 Promise"),
+    File("lib/lib.es2018.regexp.d.ts", "ES2018 Regexp"),
+    File("lib/lib.esnext.array.d.ts", "ESNext Array"),
+    File("lib/lib.esnext.asynciterable.d.ts", "ESNext Async Iterable"),
+    File("lib/lib.esnext.bigint.d.ts", "ESNext Big Int"),
+    File("lib/lib.esnext.intl.d.ts", "ESNext Intl"),
+    File("lib/lib.esnext.symbol.d.ts", "ESNext Symbol"),
+    File("lib/lib.scripthost.d.ts", "Script Host"),
+    File("lib/lib.webworker.d.ts", "Web Worker"),
+    File("lib/lib.webworker.importscripts.d.ts", "Web Worker Import Scripts"),
 ]
 BUILTINS = [
     '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#abstract-classes"><code>abstract</code> (w/ classes)</a></li>',
@@ -104,19 +102,19 @@ BUILTINS = [
 
 def write_introduction_paragraph(fout, version):
     INTRODUCTON_LINES = [
-        '<p>\n',
+        "<p>\n",
         '<a href="https://www.typescriptlang.org/">TypeScript</a> \n',
-        'is a typed superset of JavaScript that compiles to plain JavaScript. \n',
-        'This is a list of TypeScript types generated from the declaration files in \n',
+        "is a typed superset of JavaScript that compiles to plain JavaScript. \n",
+        "This is a list of TypeScript types generated from the declaration files in \n",
         f'<a href="{GITHUB_BASE_URL}/{version}">{GITHUB_BASE_URL}/{version}</a>. \n',
-        'The script to generate this list is \n',
+        "The script to generate this list is \n",
         '<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n',
-        'Fixes welcome.\n',
-        'See also my\n',
+        "Fixes welcome.\n",
+        "See also my\n",
         '<a href="/typescript-react-cheat-sheet/latest/">TypeScript React cheat sheet</a>,\n',
         '<a href="/flow-type-cheat-sheet/latest/">Flow type cheat sheet</a>,\n',
         'and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n',
-        '</p>\n\n',
+        "</p>\n\n",
     ]
     for line in INTRODUCTON_LINES:
         fout.write(line)
@@ -126,17 +124,15 @@ def write_list_of_versions(fout, this_version):
     version_list = []
     for index, version in enumerate(VERSIONS):
         if index == 0:
-            slug = 'latest'
+            slug = "latest"
         else:
             slug = version
         if version == this_version:
-            version_list.append(
-                f' <strong style="font-size: 120%">{version}</strong>')
+            version_list.append(f' <strong style="font-size: 120%">{version}</strong>')
         else:
-            version_list.append(
-                f' <a href="{PUBLISH_BASE_URL}/{slug}/">{version}</a>')
-    version_string = ''.join(version_list)
-    fout.write(f'<p>TypeScript version: {version_string}</p>\n\n')
+            version_list.append(f' <a href="{PUBLISH_BASE_URL}/{slug}/">{version}</a>')
+    version_string = "".join(version_list)
+    fout.write(f"<p>TypeScript version: {version_string}</p>\n\n")
 
 
 def main():
@@ -153,5 +149,5 @@ def main():
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

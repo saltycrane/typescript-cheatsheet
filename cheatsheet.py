@@ -7,31 +7,35 @@ from collections import namedtuple
 ################
 # records
 ################
-File = namedtuple('File', ['filepath', 'heading'])
-FileResult = namedtuple(
-    'FileResult', ['filepath', 'heading', 'type_results'])
-LinkInfo = namedtuple('Variation', [
-    'display',  # string
-    'type',     # interface | type | var | const | function | namespace
-    'filepath', # string
-    'line_no',  # number
-])
+File = namedtuple("File", ["filepath", "heading"])
+FileResult = namedtuple("FileResult", ["filepath", "heading", "type_results"])
+LinkInfo = namedtuple(
+    "Variation",
+    [
+        "display",  # string
+        "type",  # interface | type | var | const | function | namespace
+        "filepath",  # string
+        "line_no",  # number
+    ],
+)
 TypeResult = namedtuple(
-    'TypeResult', [
-        'version',    # string
-        'name',       # string
-        'variations', # LinkInfo[]
-        'members',    # TypeResult[] | None
-    ])
+    "TypeResult",
+    [
+        "version",  # string
+        "name",  # string
+        "variations",  # LinkInfo[]
+        "members",  # TypeResult[] | None
+    ],
+)
 
 
 ################
 # globals
 ################
-OUTPUT_TEMPLATE = ''
-GITHUB_BASE_URL = ''
-GITHUB_RAW_BASE_URL = ''
-PUBLISH_BASE_URL = ''
+OUTPUT_TEMPLATE = ""
+GITHUB_BASE_URL = ""
+GITHUB_RAW_BASE_URL = ""
+PUBLISH_BASE_URL = ""
 VERSIONS = []
 FILES = []
 BUILTINS = []
@@ -87,8 +91,8 @@ def get_file_results(version):
     """
     file_results = []
     for filepath, heading in FILES:
-        raw_url = f'{GITHUB_RAW_BASE_URL}/{version}/{filepath}'
-        print('raw_url', raw_url)
+        raw_url = f"{GITHUB_RAW_BASE_URL}/{version}/{filepath}"
+        print("raw_url", raw_url)
         body = download_file(raw_url)
         type_results = parse_file(body, version, filepath)
         type_results = post_process(type_results)
@@ -98,7 +102,7 @@ def get_file_results(version):
 
 def download_file(url):
     response = urllib.request.urlopen(url)
-    body = response.read().decode('utf-8')
+    body = response.read().decode("utf-8")
     return body
 
 
@@ -106,7 +110,7 @@ def parse_file(body, version, filepath):
     """extract types from the file using regular expressions
     """
     type_results = []
-    indentation = ''
+    indentation = ""
     namespace = None
     multiline = False
     for single_line_index, single_line in enumerate(body.splitlines()):
@@ -114,13 +118,10 @@ def parse_file(body, version, filepath):
         # multi-line handling... if the line starts a type declaration but
         # finishes on a subsequent line, enter multiline state and start
         # concatenating lines until the final character is found.
-        CHAR_DENOTING_END_OF_MULTILINE = {
-            'declare class': '{',
-            'type': '=',
-        }
+        CHAR_DENOTING_END_OF_MULTILINE = {"declare class": "{", "type": "="}
 
         # start of multi-line
-        match = re.search(r'^\s*(declare class|type) .+', single_line)
+        match = re.search(r"^\s*(declare class|type) .+", single_line)
         if match and CHAR_DENOTING_END_OF_MULTILINE[match.group(1)] not in single_line:
             multiline = True
             line_index = single_line_index
@@ -145,29 +146,25 @@ def parse_file(body, version, filepath):
 
         # start of a namespace
         match = re.search(
-            r'^\s*(export\s+)?(declare\s+)?namespace\s+(?P<name>.+)\s*{', line)
+            r"^\s*(export\s+)?(declare\s+)?namespace\s+(?P<name>.+)\s*{", line
+        )
         if match:
-            indentation = r'\s+'
+            indentation = r"\s+"
             namespace = TypeResult(
                 version,
-                match.group('name'),
+                match.group("name"),
                 variations=[
-                    LinkInfo(
-                        match.group('name'),
-                        'namespace',
-                        filepath,
-                        line_index + 1,
-                    )
+                    LinkInfo(match.group("name"), "namespace", filepath, line_index + 1)
                 ],
                 members=[],
             )
             continue
 
         # end of a namespace
-        match = re.search(r'^}', line)
+        match = re.search(r"^}", line)
         if match and namespace:
             print("Members count: ", len(namespace.members))
-            indentation = ''
+            indentation = ""
             type_results.append(namespace)
             namespace = None
             continue
@@ -184,56 +181,63 @@ def parse_file(body, version, filepath):
             if not match:
                 return
             link_info = LinkInfo(
-                match.group('name') + match.groupdict().get('sig', ''),
+                match.group("name") + match.groupdict().get("sig", ""),
                 type,
                 filepath,
                 line_index + 1,
             )
             existing_result = next(
-                (x for x in appender if x.name == match.group('name')), None)
+                (x for x in appender if x.name == match.group("name")), None
+            )
             if existing_result:
                 existing_result.variations.append(link_info)
             else:
                 appender.append(
                     TypeResult(
                         version,
-                        match.group('name'),
+                        match.group("name"),
                         variations=[link_info],
                         members=None,
                     )
                 )
 
         # e.g. interface Element extends React.ReactElement<any, any> {
-        add_result(r'^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\s+extends\s+[^<]*\s*\<.*\>).*{', 'interface')
+        add_result(
+            r"^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\s+extends\s+[^<]*\s*\<.*\>).*{",
+            "interface",
+        )
         # e.g. interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> {
-        add_result(r'^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\<.*\>).*{', 'interface')
+        add_result(
+            r"^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\<.*\>).*{", "interface"
+        )
         # e.g. interface IntrinsicElements {
-        add_result(r'^\s*(export\s+)?interface\s+(?P<name>\w+)[^<]*{', 'interface')
-        add_result(r'^\s*(export\s+)?type\s+(?P<name>[^=]+)\s+=', 'type')
-        add_result(r'^\s*(export\s+)?(declare\s+)?var\s+(?P<name>[^:]+)\s*:', 'var')
-        add_result(r'^\s*(export\s+)?(declare\s+)?const\s+(?P<name>[^:]+)\s*:', 'const')
-        add_result(r'^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)(?P<sig>\<.*\>)\(', 'function')
-        add_result(r'^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)[^<]*\(', 'function')
+        add_result(r"^\s*(export\s+)?interface\s+(?P<name>\w+)[^<]*{", "interface")
+        add_result(r"^\s*(export\s+)?type\s+(?P<name>[^=]+)\s+=", "type")
+        add_result(r"^\s*(export\s+)?(declare\s+)?var\s+(?P<name>[^:]+)\s*:", "var")
+        add_result(r"^\s*(export\s+)?(declare\s+)?const\s+(?P<name>[^:]+)\s*:", "const")
+        add_result(
+            r"^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)(?P<sig>\<.*\>)\(",
+            "function",
+        )
+        add_result(
+            r"^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)[^<]*\(", "function"
+        )
 
-    print('Count:', len(type_results))
+    print("Count:", len(type_results))
     return type_results
 
 
 def post_process(type_results):
     """sort and clean the results
     """
+
     def transform_result(type_result):
         version, name, variations, members = type_result
         variations = sorted(variations, key=lambda x: len(x.display))
         variations = sorted(variations, key=lambda x: x.type)
         if members:
             members = post_process(members)
-        return TypeResult(
-            version,
-            name,
-            variations,
-            members,
-        )
+        return TypeResult(version, name, variations, members)
 
     type_results = [transform_result(result) for result in type_results]
     type_results = sorted(type_results, key=lambda result: result.name.lower())
@@ -244,8 +248,10 @@ def post_process(type_results):
 # write_output
 ################
 def write_output(file_results, version):
-    fout = open(OUTPUT_TEMPLATE.format(version=version), 'w')
-    fout.write('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">\n\n')
+    fout = open(OUTPUT_TEMPLATE.format(version=version), "w")
+    fout.write(
+        '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">\n\n'
+    )
     write_introduction_paragraph(fout, version)
     write_list_of_versions(fout, version)
     write_table_of_contents(fout)
@@ -260,33 +266,21 @@ def write_table_of_contents(fout):
     else:
         lines = []
     lines = lines + [
-        f'<li><a href="#{filepath}">{heading}</a></li>\n'
-        for filepath, heading in FILES]
-    write_panel_with_3_columns(
-        fout,
-        lines,
-        '<h4 id="toc">Table of Contents</h4>',
-    )
+        f'<li><a href="#{filepath}">{heading}</a></li>\n' for filepath, heading in FILES
+    ]
+    write_panel_with_3_columns(fout, lines, '<h4 id="toc">Table of Contents</h4>')
 
 
 def write_builtins_panel(fout):
     if not BUILTINS:
         return
-    write_panel_with_3_columns(
-        fout,
-        BUILTINS,
-        '<h4 id="builtins">Built-ins</h4>',
-    )
+    write_panel_with_3_columns(fout, BUILTINS, '<h4 id="builtins">Built-ins</h4>')
 
 
 def write_panels_of_results(fout, file_results):
     for filepath, heading, type_results in file_results:
         lines = generate_output_lines(type_results)
-        write_panel_with_3_columns(
-            fout,
-            lines,
-            f'<h4 id={filepath}>{heading}</h4>',
-        )
+        write_panel_with_3_columns(fout, lines, f"<h4 id={filepath}>{heading}</h4>")
 
 
 def generate_output_lines(type_results):
@@ -308,16 +302,16 @@ def generate_result(type_result):
     version, name, variations, members = type_result
     if members:
         link = generate_alinks(version, variations)
-        lines.append('<li>{link}<ul>'.format(link=link))
+        lines.append("<li>{link}<ul>".format(link=link))
         for child_result in members:
             child_lines = generate_result(child_result)
             lines.extend(child_lines)
         # mutate list so that <ul> tags don't count as items in the list when
         # grouping columns
-        lines[-1] = '{last_line}</ul></li>'.format(last_line=lines[-1])
+        lines[-1] = "{last_line}</ul></li>".format(last_line=lines[-1])
     else:
         link = generate_alinks(version, variations)
-        lines.append('<li>{link}</li>'.format(link=link))
+        lines.append("<li>{link}</li>".format(link=link))
     return lines
 
 
@@ -327,11 +321,10 @@ def generate_alinks(version, variations):
     """
     alinks = []
     for display, type, filepath, line_no in variations:
-        github_url = f'{GITHUB_BASE_URL}/{version}/{filepath}#L{line_no}'
+        github_url = f"{GITHUB_BASE_URL}/{version}/{filepath}#L{line_no}"
         display = html_escape(display)
-        alinks.append(
-            f'<a href="{github_url}">{display}</a> <small>({type})</small>')
-    return ' &#8729; '.join(alinks)
+        alinks.append(f'<a href="{github_url}">{display}</a> <small>({type})</small>')
+    return " &#8729; ".join(alinks)
 
 
 def write_panel_with_3_columns(fout, items, heading):
@@ -364,24 +357,24 @@ def write_panel_with_3_columns(fout, items, heading):
     # start bootstrap columns
     ul_tag_count = 0
     for group in grouped:
-        extra_ul_tags = '<ul>' * ul_tag_count
-        fout.write('<div class="col-sm-4"><ul>' + extra_ul_tags + '\n')
+        extra_ul_tags = "<ul>" * ul_tag_count
+        fout.write('<div class="col-sm-4"><ul>' + extra_ul_tags + "\n")
         for line in group:
-            if '<ul>' in line:
+            if "<ul>" in line:
                 ul_tag_count += 1
-            if '</ul>' in line:
+            if "</ul>" in line:
                 ul_tag_count -= 1
-            fout.write(line + '\n')
-        extra_ul_tags = '</ul>' * ul_tag_count
-        fout.write(extra_ul_tags + '</ul></div>\n')
+            fout.write(line + "\n")
+        extra_ul_tags = "</ul>" * ul_tag_count
+        fout.write(extra_ul_tags + "</ul></div>\n")
     # end bootstrap columns
 
-    fout.write('</div></div></div>\n')
+    fout.write("</div></div></div>\n")
     # end bootstrap panel
 
 
 def html_escape(text):
-    text = text.replace('&', '&amp;')
-    text = text.replace('<', '&lt;')
-    text = text.replace('>', '&gt;')
+    text = text.replace("&", "&amp;")
+    text = text.replace("<", "&lt;")
+    text = text.replace(">", "&gt;")
     return text
