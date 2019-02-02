@@ -2,28 +2,56 @@
 Usage: python3 react_cheatsheet.py
 
 """
-from cheatsheet import File, make_cheatsheet
+from cheatsheet import File, Group, make_cheatsheet
 
 
 ################
 # constants
 ################
-OUTPUT_TEMPLATE = "dist/react/{version}.html"
-GITHUB_BASE_URL = "https://github.com/DefinitelyTyped/DefinitelyTyped/tree"
-GITHUB_RAW_BASE_URL = (
+DEFINITELY_BASE_URL = "https://github.com/DefinitelyTyped/DefinitelyTyped/tree"
+DEFINITELY_RAW_BASE_URL = (
     "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped"
 )
+OUTPUT_TEMPLATE = "dist/react/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-react-cheat-sheet"
-VERSIONS = ["cad160cba6d54462be720e0c93e8607d01a4a2d0"]
-FILES = [
-    File("types/react/index.d.ts", "React"),
-    File("types/react-dom/index.d.ts", "React DOM"),
-    File("types/react-native/index.d.ts", "React Native"),
+VERSIONS = [
+    {
+        "cheatsheet": "c807902",
+        "react": "c807902",
+        "react-dom": "c807902",
+        "react-native": "c807902",
+    }
+]
+GROUPS = [
+    Group(
+        "React",
+        "react",
+        DEFINITELY_BASE_URL,
+        DEFINITELY_RAW_BASE_URL,
+        [File("types/react/index.d.ts", "react")],
+    ),
+    Group(
+        "React DOM",
+        "react-dom",
+        DEFINITELY_BASE_URL,
+        DEFINITELY_RAW_BASE_URL,
+        [File("types/react-dom/index.d.ts", "react-dom")],
+    ),
+    Group(
+        "React Native",
+        "react-native",
+        DEFINITELY_BASE_URL,
+        DEFINITELY_RAW_BASE_URL,
+        [File("types/react-native/index.d.ts", "react-native")],
+    ),
 ]
 BUILTINS = []
 
 
-def write_introduction_paragraph(fout, version):
+# TODO: in middle of converting react_cheatsheet.py
+
+
+def write_introduction_paragraph(fout, cheatsheet_version):
     INTRODUCTON_LINES = [
         "<p>\n",
         '<a href="https://www.typescriptlang.org/">TypeScript</a> \n',
@@ -32,13 +60,13 @@ def write_introduction_paragraph(fout, version):
         "<code>react</code>, ",
         "<code>react-dom</code>, and ",
         "<code>react-native</code> in \n",
-        f'<a href="{GITHUB_BASE_URL}/{version}">{GITHUB_BASE_URL}/{version[0:7]}</a>. \n',
+        f'<a href="{DEFINITELY_BASE_URL}/{cheatsheet_version}">',
+        f"{DEFINITELY_BASE_URL}/{cheatsheet_version}</a>. \n",
         "The script to generate this list is \n",
         '<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n',
         "Fixes welcome.\n",
         "See also my\n",
         '<a href="/typescript-cheat-sheet/latest/">TypeScript cheat sheet</a>,\n',
-        '<a href="/flow-type-cheat-sheet/latest/">Flow type cheat sheet</a>,\n',
         'and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n',
         "</p>\n\n",
     ]
@@ -53,11 +81,9 @@ def write_list_of_versions(fout, this_version):
 def main():
     make_cheatsheet(
         OUTPUT_TEMPLATE,
-        GITHUB_BASE_URL,
-        GITHUB_RAW_BASE_URL,
         PUBLISH_BASE_URL,
         VERSIONS,
-        FILES,
+        GROUPS,
         BUILTINS,
         write_introduction_paragraph,
         write_list_of_versions,

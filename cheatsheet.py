@@ -7,13 +7,25 @@ from collections import namedtuple
 ################
 # records
 ################
-File = namedtuple("File", ["filepath", "heading"])
-FileResult = namedtuple("FileResult", ["filepath", "heading", "type_results"])
+File = namedtuple("File", ["filepath", "display"])
+Group = namedtuple(
+    "Group",
+    [
+        "heading",  # string (heading text)
+        "id",  # string (used as html id attribute and to key into other data structures)
+        "github_url",  # string
+        "raw_url",  # string
+        "files",  # File[]
+    ],
+)
+GroupResult = namedtuple("GroupResult", ["heading", "id", "type_results"])
 LinkInfo = namedtuple(
-    "Variation",
+    "LinkInfo",
     [
         "display",  # string
         "type",  # interface | type | var | const | function | namespace
+        "file_key",  # string
+        "github_url",  # string
         "filepath",  # string
         "line_no",  # number
     ],
@@ -33,11 +45,9 @@ TypeResult = namedtuple(
 # globals
 ################
 OUTPUT_TEMPLATE = ""
-GITHUB_BASE_URL = ""
-GITHUB_RAW_BASE_URL = ""
 PUBLISH_BASE_URL = ""
 VERSIONS = []
-FILES = []
+GROUPS = []
 BUILTINS = []
 INTRODUCTON_LINES = []
 write_introduction_paragraph = None
@@ -49,55 +59,54 @@ write_list_of_versions = None
 ################
 def make_cheatsheet(
     output_template,
-    github_base_url,
-    github_raw_base_url,
     publish_base_url,
     versions,
-    files,
+    groups,
     builtins,
     write_introduction_paragraph_func,
     write_list_of_versions_func,
 ):
     global OUTPUT_TEMPLATE
-    global GITHUB_BASE_URL
-    global GITHUB_RAW_BASE_URL
     global PUBLISH_BASE_URL
     global VERSIONS
-    global FILES
+    global GROUPS
     global BUILTINS
     global INTRODUCTON_LINES
     global write_introduction_paragraph
     global write_list_of_versions
     OUTPUT_TEMPLATE = output_template
-    GITHUB_BASE_URL = github_base_url
-    GITHUB_RAW_BASE_URL = github_raw_base_url
     PUBLISH_BASE_URL = publish_base_url
     VERSIONS = versions
-    FILES = files
+    GROUPS = groups
     BUILTINS = builtins
     write_introduction_paragraph = write_introduction_paragraph_func
     write_list_of_versions = write_list_of_versions_func
 
-    for version in VERSIONS:
-        file_results = get_file_results(version)
-        write_output(file_results, version)
+    for version_map in VERSIONS:
+        group_results = get_group_results(version_map)
+        write_output(group_results, version_map)
 
 
 ################
-# get_file_results
+# get_group_results
 ################
-def get_file_results(version):
+def get_group_results(version_map):
     """get results for all files
     """
-    file_results = []
-    for filepath, heading in FILES:
-        raw_url = f"{GITHUB_RAW_BASE_URL}/{version}/{filepath}"
-        print("raw_url", raw_url)
-        body = download_file(raw_url)
-        type_results = parse_file(body, version, filepath)
+    group_results = []
+    for heading, id, github_url, raw_url, files in GROUPS:
+        version = version_map[id]
+        type_results = []
+        for filepath, display in files:
+            full_raw_url = f"{raw_url}/{version}/{filepath}"
+            print("full_raw_url", full_raw_url)
+            body = download_file(full_raw_url)
+            type_results = parse_file(
+                type_results, body, github_url, version, filepath, display
+            )
         type_results = post_process(type_results)
-        file_results.append(FileResult(filepath, heading, type_results))
-    return file_results
+        group_results.append(GroupResult(heading, id, type_results))
+    return group_results
 
 
 def download_file(url):
@@ -106,10 +115,9 @@ def download_file(url):
     return body
 
 
-def parse_file(body, version, filepath):
+def parse_file(type_results, body, github_url, version, filepath, file_key):
     """extract types from the file using regular expressions
     """
-    type_results = []
     indentation = ""
     namespace = None
     multiline = False
@@ -122,7 +130,11 @@ def parse_file(body, version, filepath):
 
         # start of multi-line
         match = re.search(r"^\s*(declare class|type) .+", single_line)
-        if match and CHAR_DENOTING_END_OF_MULTILINE[match.group(1)] not in single_line:
+        if (
+            match
+            and CHAR_DENOTING_END_OF_MULTILINE[match.group(1)]
+            not in single_line
+        ):
             multiline = True
             line_index = single_line_index
             line = single_line
@@ -146,7 +158,8 @@ def parse_file(body, version, filepath):
 
         # start of a namespace
         match = re.search(
-            r"^\s*(export\s+)?(declare\s+)?namespace\s+(?P<name>.+)\s*{", line
+            r"^\s*(export\s+)?(declare\s+)?(?P<type>namespace|module)\s+(?P<name>.+)\s*{",
+            line,
         )
         if match:
             indentation = r"\s+"
@@ -154,7 +167,14 @@ def parse_file(body, version, filepath):
                 version,
                 match.group("name"),
                 variations=[
-                    LinkInfo(match.group("name"), "namespace", filepath, line_index + 1)
+                    LinkInfo(
+                        display=match.group("name"),
+                        type=match.group("type"),
+                        file_key=file_key,
+                        github_url=github_url,
+                        filepath=filepath,
+                        line_no=line_index + 1,
+                    )
                 ],
                 members=[],
             )
@@ -181,10 +201,12 @@ def parse_file(body, version, filepath):
             if not match:
                 return
             link_info = LinkInfo(
-                match.group("name") + match.groupdict().get("sig", ""),
-                type,
-                filepath,
-                line_index + 1,
+                display=match.group("name") + match.groupdict().get("sig", ""),
+                type=type,
+                file_key=file_key,
+                github_url=github_url,
+                filepath=filepath,
+                line_no=line_index + 1,
             )
             existing_result = next(
                 (x for x in appender if x.name == match.group("name")), None
@@ -208,19 +230,27 @@ def parse_file(body, version, filepath):
         )
         # e.g. interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> {
         add_result(
-            r"^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\<.*\>).*{", "interface"
+            r"^\s*(export\s+)?interface\s+(?P<name>\w+)(?P<sig>\<.*\>).*{",
+            "interface",
         )
         # e.g. interface IntrinsicElements {
-        add_result(r"^\s*(export\s+)?interface\s+(?P<name>\w+)[^<]*{", "interface")
+        add_result(
+            r"^\s*(export\s+)?interface\s+(?P<name>\w+)[^<]*{", "interface"
+        )
         add_result(r"^\s*(export\s+)?type\s+(?P<name>[^=]+)\s+=", "type")
-        add_result(r"^\s*(export\s+)?(declare\s+)?var\s+(?P<name>[^:]+)\s*:", "var")
-        add_result(r"^\s*(export\s+)?(declare\s+)?const\s+(?P<name>[^:]+)\s*:", "const")
+        add_result(
+            r"^\s*(export\s+)?(declare\s+)?var\s+(?P<name>[^:]+)\s*:", "var"
+        )
+        add_result(
+            r"^\s*(export\s+)?(declare\s+)?const\s+(?P<name>[^:]+)\s*:", "const"
+        )
         add_result(
             r"^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)(?P<sig>\<.*\>)\(",
             "function",
         )
         add_result(
-            r"^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)[^<]*\(", "function"
+            r"^\s*(export\s+)?(declare\s+)?function\s+(?P<name>\w+)[^<]*\(",
+            "function",
         )
 
     print("Count:", len(type_results))
@@ -247,17 +277,24 @@ def post_process(type_results):
 ################
 # write_output
 ################
-def write_output(file_results, version):
-    fout = open(OUTPUT_TEMPLATE.format(version=version), "w")
+def write_output(group_results, version_map):
+    cheatsheet_version = version_map["cheatsheet"]
+    fout = open(
+        OUTPUT_TEMPLATE.format(cheatsheet_version=cheatsheet_version), "w"
+    )
+    write_header(fout)
+    write_introduction_paragraph(fout, cheatsheet_version)
+    write_list_of_versions(fout, cheatsheet_version)
+    write_table_of_contents(fout)
+    write_builtins_panel(fout)
+    write_panels_of_results(fout, group_results)
+    fout.close()
+
+
+def write_header(fout):
     fout.write(
         '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">\n\n'
     )
-    write_introduction_paragraph(fout, version)
-    write_list_of_versions(fout, version)
-    write_table_of_contents(fout)
-    write_builtins_panel(fout)
-    write_panels_of_results(fout, file_results)
-    fout.close()
 
 
 def write_table_of_contents(fout):
@@ -266,21 +303,26 @@ def write_table_of_contents(fout):
     else:
         lines = []
     lines = lines + [
-        f'<li><a href="#{filepath}">{heading}</a></li>\n' for filepath, heading in FILES
+        f'<li><a href="#{group.id}">{group.heading}</a></li>\n'
+        for group in GROUPS
     ]
-    write_panel_with_3_columns(fout, lines, '<h4 id="toc">Table of Contents</h4>')
+    write_panel_with_3_columns(
+        fout, lines, '<h4 id="toc">Table of Contents</h4>'
+    )
 
 
 def write_builtins_panel(fout):
     if not BUILTINS:
         return
-    write_panel_with_3_columns(fout, BUILTINS, '<h4 id="builtins">Built-ins</h4>')
+    write_panel_with_3_columns(
+        fout, BUILTINS, '<h4 id="builtins">Built-ins</h4>'
+    )
 
 
-def write_panels_of_results(fout, file_results):
-    for filepath, heading, type_results in file_results:
+def write_panels_of_results(fout, group_results):
+    for heading, id, type_results in group_results:
         lines = generate_output_lines(type_results)
-        write_panel_with_3_columns(fout, lines, f"<h4 id={filepath}>{heading}</h4>")
+        write_panel_with_3_columns(fout, lines, f"<h4 id={id}>{heading}</h4>")
 
 
 def generate_output_lines(type_results):
@@ -315,15 +357,48 @@ def generate_result(type_result):
     return lines
 
 
-# TODO: try running again
 def generate_alinks(version, variations):
     """return html for a single <a> link
     """
+    interface_variations = [x for x in variations if x.type == "interface"]
+    other_variations = [x for x in variations if x.type != "interface"]
+
     alinks = []
-    for display, type, filepath, line_no in variations:
-        github_url = f"{GITHUB_BASE_URL}/{version}/{filepath}#L{line_no}"
+    for (
+        index,
+        (display, type, file_key, github_url, filepath, line_no),
+    ) in enumerate(interface_variations):
+        github_url = f"{github_url}/{version}/{filepath}#L{line_no}"
         display = html_escape(display)
-        alinks.append(f'<a href="{github_url}">{display}</a> <small>({type})</small>')
+
+        if len(interface_variations) == 1:
+            alinks.append(
+                f'<a href="{github_url}">{display}</a> <small>({type})</small>'
+            )
+            continue
+
+        if index == 0:
+            alink = f'<a href="{github_url}">{display} <small>{file_key}</small></a>'
+        else:
+            alink = f'<a href="{github_url}"><small>{file_key}</small></a>'
+        if index == len(interface_variations) - 1:
+            alink += f" <small>({type})</small>"
+        alinks.append(alink)
+
+    for (
+        display,
+        type,
+        file_key,
+        github_url,
+        filepath,
+        line_no,
+    ) in other_variations:
+        github_url = f"{github_url}/{version}/{filepath}#L{line_no}"
+        display = html_escape(display)
+        alinks.append(
+            f'<a href="{github_url}">{display}</a> <small>({type})</small>'
+        )
+
     return " &#8729; ".join(alinks)
 
 

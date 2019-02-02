@@ -2,48 +2,150 @@
 Usage: python3 typescript_cheatsheet.py
 
 """
-from cheatsheet import File, make_cheatsheet
+from cheatsheet import File, Group, make_cheatsheet
 
 
 ################
 # constants
 ################
-OUTPUT_TEMPLATE = "dist/typescript/{version}.html"
-GITHUB_BASE_URL = "https://github.com/Microsoft/TypeScript/tree"
-GITHUB_RAW_BASE_URL = "https://raw.githubusercontent.com/Microsoft/TypeScript"
+TYPESCRIPT_BASE_URL = "https://github.com/Microsoft/TypeScript/tree"
+TYPESCRIPT_RAW_BASE_URL = (
+    "https://raw.githubusercontent.com/Microsoft/TypeScript"
+)
+OUTPUT_TEMPLATE = "dist/typescript/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-cheat-sheet"
-VERSIONS = ["v3.2.4"]
-FILES = [
-    File("lib/lib.dom.d.ts", "DOM"),
-    File("lib/lib.dom.iterable.d.ts", "DOM Iterable"),
-    File("lib/lib.es5.d.ts", "ES5"),
-    File("lib/lib.es2015.collection.d.ts", "ES2015 Collection"),
-    File("lib/lib.es2015.core.d.ts", "ES2015 Core"),
-    File("lib/lib.es2015.generator.d.ts", "ES2015 Generator"),
-    File("lib/lib.es2015.iterable.d.ts", "ES2015 Iterable"),
-    File("lib/lib.es2015.promise.d.ts", "ES2015 Promise"),
-    File("lib/lib.es2015.proxy.d.ts", "ES2015 Proxy"),
-    File("lib/lib.es2015.reflect.d.ts", "ES2015 Reflect"),
-    File("lib/lib.es2015.symbol.d.ts", "ES2015 Symbol"),
-    File("lib/lib.es2015.symbol.wellknown.d.ts", "ES2015 Symbol Well Known"),
-    File("lib/lib.es2016.array.include.d.ts", "ES2016 Array Include"),
-    File("lib/lib.es2017.intl.d.ts", "ES2017 Intl"),
-    File("lib/lib.es2017.object.d.ts", "ES2017 Object"),
-    File("lib/lib.es2017.sharedmemory.d.ts", "ES2017 Shared Memory"),
-    File("lib/lib.es2017.string.d.ts", "ES2017 String"),
-    File("lib/lib.es2017.typedarrays.d.ts", "ES2017 Typed Arrays"),
-    File("lib/lib.es2018.intl.d.ts", "ES2018 Intl"),
-    File("lib/lib.es2018.promise.d.ts", "ES2018 Promise"),
-    File("lib/lib.es2018.regexp.d.ts", "ES2018 Regexp"),
-    File("lib/lib.esnext.array.d.ts", "ESNext Array"),
-    File("lib/lib.esnext.asynciterable.d.ts", "ESNext Async Iterable"),
-    File("lib/lib.esnext.bigint.d.ts", "ESNext Big Int"),
-    File("lib/lib.esnext.intl.d.ts", "ESNext Intl"),
-    File("lib/lib.esnext.symbol.d.ts", "ESNext Symbol"),
-    File("lib/lib.scripthost.d.ts", "Script Host"),
-    File("lib/lib.webworker.d.ts", "Web Worker"),
-    File("lib/lib.webworker.importscripts.d.ts", "Web Worker Import Scripts"),
+VERSIONS = [
+    {
+        "cheatsheet": "v3.3.1",
+        "es": "v3.3.1",
+        "dom": "v3.3.1",
+        "scripthost": "v3.3.1",
+        "webworker": "v3.3.1",
+        "node": "c807902",
+    }
 ]
+
+GROUPS = [
+    Group(
+        "ES5, ES2015-ES2018, ESNext",
+        "es",
+        TYPESCRIPT_BASE_URL,
+        TYPESCRIPT_RAW_BASE_URL,
+        [
+            File("lib/lib.es5.d.ts", "es5"),
+            File("lib/lib.es2015.collection.d.ts", "es2015.collection"),
+            File("lib/lib.es2015.core.d.ts", "es2015.core"),
+            File("lib/lib.es2015.generator.d.ts", "es2015.generator"),
+            File("lib/lib.es2015.iterable.d.ts", "es2015.iterable"),
+            File("lib/lib.es2015.promise.d.ts", "es2015.promise"),
+            File("lib/lib.es2015.proxy.d.ts", "es2015.proxy"),
+            File("lib/lib.es2015.reflect.d.ts", "es2015.reflect"),
+            File("lib/lib.es2015.symbol.d.ts", "es2015.symbol"),
+            File(
+                "lib/lib.es2015.symbol.wellknown.d.ts",
+                "es2015.symbol.wellknown",
+            ),
+            File("lib/lib.es2016.array.include.d.ts", "es2016.array.include"),
+            File("lib/lib.es2017.intl.d.ts", "es2017.intl"),
+            File("lib/lib.es2017.object.d.ts", "es2017.object"),
+            File("lib/lib.es2017.sharedmemory.d.ts", "es2017.sharedmemory"),
+            File("lib/lib.es2017.string.d.ts", "es2017.string"),
+            File("lib/lib.es2017.typedarrays.d.ts", "es2017.typedarrays"),
+            File("lib/lib.es2018.intl.d.ts", "es2018.intl"),
+            File("lib/lib.es2018.promise.d.ts", "es2018.promise"),
+            File("lib/lib.es2018.regexp.d.ts", "es2018.regexp"),
+            File("lib/lib.esnext.array.d.ts", "esnext.array"),
+            File("lib/lib.esnext.asynciterable.d.ts", "esnext.asynciterable"),
+            File("lib/lib.esnext.bigint.d.ts", "esnext.bigint"),
+            File("lib/lib.esnext.intl.d.ts", "esnext.intl"),
+            File("lib/lib.esnext.symbol.d.ts", "esnext.symbol"),
+        ],
+    ),
+    Group(
+        "DOM",
+        "dom",
+        TYPESCRIPT_BASE_URL,
+        TYPESCRIPT_RAW_BASE_URL,
+        [
+            File("lib/lib.dom.d.ts", "dom"),
+            File("lib/lib.dom.iterable.d.ts", "dom.iterable"),
+        ],
+    ),
+    Group(
+        "Script Host",
+        "scripthost",
+        TYPESCRIPT_BASE_URL,
+        TYPESCRIPT_RAW_BASE_URL,
+        [File("lib/lib.scripthost.d.ts", None)],
+    ),
+    Group(
+        "Web Worker",
+        "webworker",
+        TYPESCRIPT_BASE_URL,
+        TYPESCRIPT_RAW_BASE_URL,
+        [
+            File("lib/lib.webworker.d.ts", "webworker"),
+            File(
+                "lib/lib.webworker.importscripts.d.ts",
+                "webworker.importscripts",
+            ),
+        ],
+    ),
+    Group(
+        "Node.js",
+        "node",
+        "https://github.com/DefinitelyTyped/DefinitelyTyped/tree",
+        "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped",
+        [
+            File("types/node/assert.d.ts", None),
+            File("types/node/async_hooks.d.ts", None),
+            File("types/node/buffer.d.ts", None),
+            File("types/node/child_process.d.ts", None),
+            File("types/node/cluster.d.ts", None),
+            File("types/node/console.d.ts", None),
+            File("types/node/constants.d.ts", None),
+            File("types/node/crypto.d.ts", None),
+            File("types/node/dgram.d.ts", None),
+            File("types/node/dns.d.ts", None),
+            File("types/node/domain.d.ts", None),
+            File("types/node/events.d.ts", None),
+            File("types/node/fs.d.ts", None),
+            File("types/node/globals.d.ts", None),
+            File("types/node/http.d.ts", None),
+            File("types/node/http2.d.ts", None),
+            File("types/node/https.d.ts", None),
+            File("types/node/index.d.ts", None),
+            File("types/node/inspector.d.ts", None),
+            File("types/node/module.d.ts", None),
+            File("types/node/net.d.ts", None),
+            File("types/node/node-tests.ts", None),
+            File("types/node/os.d.ts", None),
+            File("types/node/path.d.ts", None),
+            File("types/node/perf_hooks.d.ts", None),
+            File("types/node/process.d.ts", None),
+            File("types/node/punycode.d.ts", None),
+            File("types/node/querystring.d.ts", None),
+            File("types/node/readline.d.ts", None),
+            File("types/node/repl.d.ts", None),
+            File("types/node/stream.d.ts", None),
+            File("types/node/string_decoder.d.ts", None),
+            File("types/node/timers.d.ts", None),
+            File("types/node/tls.d.ts", None),
+            File("types/node/trace_events.d.ts", None),
+            File("types/node/tsconfig.json", None),
+            File("types/node/tslint.json", None),
+            File("types/node/tty.d.ts", None),
+            File("types/node/url.d.ts", None),
+            File("types/node/util.d.ts", None),
+            File("types/node/v8.d.ts", None),
+            File("types/node/vm.d.ts", None),
+            File("types/node/worker_threads.d.ts", None),
+            File("types/node/zlib.d.ts", None),
+        ],
+    ),
+]
+
+
 BUILTINS = [
     '<li><a href="https://www.typescriptlang.org/docs/handbook/classes.html#abstract-classes"><code>abstract</code> (w/ classes)</a></li>',
     '<li><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html#any"><code>any</code></a></li>',
@@ -100,19 +202,19 @@ BUILTINS = [
 ]
 
 
-def write_introduction_paragraph(fout, version):
+def write_introduction_paragraph(fout, cheatsheet_version):
     INTRODUCTON_LINES = [
         "<p>\n",
         '<a href="https://www.typescriptlang.org/">TypeScript</a> \n',
         "is a typed superset of JavaScript that compiles to plain JavaScript. \n",
         "This is a list of TypeScript types generated from the declaration files in \n",
-        f'<a href="{GITHUB_BASE_URL}/{version}">{GITHUB_BASE_URL}/{version}</a>. \n',
+        f'<a href="{TYPESCRIPT_BASE_URL}/{cheatsheet_version}">',
+        f"{TYPESCRIPT_BASE_URL}/{cheatsheet_version}</a>. \n",
         "The script to generate this list is \n",
         '<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n',
         "Fixes welcome.\n",
         "See also my\n",
         '<a href="/typescript-react-cheat-sheet/latest/">TypeScript React cheat sheet</a>,\n',
-        '<a href="/flow-type-cheat-sheet/latest/">Flow type cheat sheet</a>,\n',
         'and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n',
         "</p>\n\n",
     ]
@@ -122,15 +224,20 @@ def write_introduction_paragraph(fout, version):
 
 def write_list_of_versions(fout, this_version):
     version_list = []
-    for index, version in enumerate(VERSIONS):
+    for index, version_map in enumerate(VERSIONS):
+        version = version_map["cheatsheet"]
         if index == 0:
             slug = "latest"
         else:
             slug = version
         if version == this_version:
-            version_list.append(f' <strong style="font-size: 120%">{version}</strong>')
+            version_list.append(
+                f' <strong style="font-size: 120%">{version}</strong>'
+            )
         else:
-            version_list.append(f' <a href="{PUBLISH_BASE_URL}/{slug}/">{version}</a>')
+            version_list.append(
+                f' <a href="{PUBLISH_BASE_URL}/{slug}/">{version}</a>'
+            )
     version_string = "".join(version_list)
     fout.write(f"<p>TypeScript version: {version_string}</p>\n\n")
 
@@ -138,11 +245,9 @@ def write_list_of_versions(fout, this_version):
 def main():
     make_cheatsheet(
         OUTPUT_TEMPLATE,
-        GITHUB_BASE_URL,
-        GITHUB_RAW_BASE_URL,
         PUBLISH_BASE_URL,
         VERSIONS,
-        FILES,
+        GROUPS,
         BUILTINS,
         write_introduction_paragraph,
         write_list_of_versions,
