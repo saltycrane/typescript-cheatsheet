@@ -14,12 +14,13 @@ DEFINITELY_RAW_BASE_URL = (
 )
 OUTPUT_TEMPLATE = "dist/react/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-react-cheat-sheet"
+DEFINITELY_VERSION = "480aadc"
 VERSIONS = [
     {
-        "cheatsheet": "c807902",
-        "react": "c807902",
-        "react-dom": "c807902",
-        "react-native": "c807902",
+        "cheatsheet": DEFINITELY_VERSION,
+        "react": DEFINITELY_VERSION,
+        "react-dom": DEFINITELY_VERSION,
+        "react-native": DEFINITELY_VERSION,
     }
 ]
 GROUPS = [

@@ -14,14 +14,17 @@ TYPESCRIPT_RAW_BASE_URL = (
 )
 OUTPUT_TEMPLATE = "dist/typescript/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-cheat-sheet"
+TYPESCRIPT_VERSION = "v3.3.3333"
+DEFINITELY_VERSION = "480aadc"
+
 VERSIONS = [
     {
-        "cheatsheet": "v3.3.1",
-        "es": "v3.3.1",
-        "dom": "v3.3.1",
-        "scripthost": "v3.3.1",
-        "webworker": "v3.3.1",
-        "node": "c807902",
+        "cheatsheet": TYPESCRIPT_VERSION,
+        "es": TYPESCRIPT_VERSION,
+        "dom": TYPESCRIPT_VERSION,
+        "scripthost": TYPESCRIPT_VERSION,
+        "webworker": TYPESCRIPT_VERSION,
+        "node": DEFINITELY_VERSION,
     }
 ]
 
