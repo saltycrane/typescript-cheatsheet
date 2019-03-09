@@ -7,7 +7,12 @@ from collections import namedtuple
 ################
 # records
 ################
-File = namedtuple("File", ["filepath", "display"])
+Version = namedtuple("Version", ["major", "minor", "patch"])
+File = namedtuple(
+    "File",
+    # string  # string  # Version
+    ["filepath", "display", "min_version"],
+)
 Group = namedtuple(
     "Group",
     [
@@ -96,8 +101,24 @@ def get_group_results(version_map):
     group_results = []
     for heading, id, github_url, raw_url, files in GROUPS:
         version = version_map[id]
+        parsed_version = parse_version_string(version)
         type_results = []
-        for filepath, display in files:
+
+        for filepath, display, min_version in files:
+            if (
+                min_version
+                and parsed_version
+                and is_version_less_than(parsed_version, min_version)
+            ):
+                print(
+                    "cheatsheet version:",
+                    version,
+                    "is less than feature min version:",
+                    min_version,
+                    "skipping...",
+                )
+                continue
+
             full_raw_url = f"{raw_url}/{version}/{filepath}"
             print("full_raw_url", full_raw_url)
             body = download_file(full_raw_url)
@@ -446,6 +467,32 @@ def write_panel_with_3_columns(fout, items, heading):
 
     fout.write("</div></div></div>\n")
     # end bootstrap panel
+
+
+def parse_version_string(version_string):
+    match = re.search(
+        r"v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)$", version_string
+    )
+    if not match:
+        return None
+
+    return Version(
+        int(match.group("major")),
+        int(match.group("minor")),
+        int(match.group("patch")),
+    )
+
+
+def is_version_less_than(left, right):
+    if left.major < right.major:
+        return True
+    if left.major == right.major:
+        if left.minor < right.minor:
+            return True
+        if left.minor == right.minor:
+            if left.patch < right.patch:
+                return True
+    return False
 
 
 def html_escape(text):
