@@ -14,15 +14,15 @@ TYPESCRIPT_RAW_BASE_URL = (
 )
 OUTPUT_TEMPLATE = "dist/typescript/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-cheat-sheet"
-DEFINITELY_VERSION = "480aadc"
+DEFINITELY_VERSION = "8201a5f"
 
 VERSIONS = [
     {
-        "cheatsheet": "v3.3.3333",
-        "es": "v3.3.3333",
-        "dom": "v3.3.3333",
-        "scripthost": "v3.3.3333",
-        "webworker": "v3.3.3333",
+        "cheatsheet": "v3.3.4000",
+        "es": "v3.3.4000",
+        "dom": "v3.3.4000",
+        "scripthost": "v3.3.4000",
+        "webworker": "v3.3.4000",
         "node": DEFINITELY_VERSION,
     },
     {
@@ -45,7 +45,7 @@ VERSIONS = [
 
 GROUPS = [
     Group(
-        "ES5, ES2015-ES2018, ESNext",
+        "ES5, ES2015-ES2019, ESNext",
         "es",
         TYPESCRIPT_BASE_URL,
         TYPESCRIPT_RAW_BASE_URL,
@@ -79,6 +79,19 @@ GROUPS = [
             File("lib/lib.es2018.intl.d.ts", "es2018.intl", None),
             File("lib/lib.es2018.promise.d.ts", "es2018.promise", None),
             File("lib/lib.es2018.regexp.d.ts", "es2018.regexp", None),
+            File(
+                "lib/lib.es2019.array.d.ts", "es2019.array", Version(3, 3, 4000)
+            ),
+            File(
+                "lib/lib.es2019.string.d.ts",
+                "es2019.string",
+                Version(3, 3, 4000),
+            ),
+            File(
+                "lib/lib.es2019.symbol.d.ts",
+                "es2019.symbol",
+                Version(3, 3, 4000),
+            ),
             File("lib/lib.esnext.array.d.ts", "esnext.array", None),
             File(
                 "lib/lib.esnext.asynciterable.d.ts",
@@ -248,10 +261,9 @@ def write_introduction_paragraph(fout, cheatsheet_version):
         f"{TYPESCRIPT_BASE_URL}/{cheatsheet_version}</a>. \n",
         "The script to generate this list is \n",
         '<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n',
-        "Fixes welcome.\n",
-        "See also my\n",
-        '<a href="/typescript-react-cheat-sheet/latest/">TypeScript React cheat sheet</a>,\n',
-        'and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n',
+        "Fixes welcome.</p>\n",
+        "<p>See also my\n",
+        '<a href="/typescript-react-cheat-sheet/latest/">TypeScript React cheat sheet</a>.\n',
         "</p>\n\n",
     ]
     for line in INTRODUCTON_LINES:

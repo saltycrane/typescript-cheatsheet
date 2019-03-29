@@ -14,36 +14,58 @@ DEFINITELY_RAW_BASE_URL = (
 )
 OUTPUT_TEMPLATE = "dist/react/{cheatsheet_version}.html"
 PUBLISH_BASE_URL = "/typescript-react-cheat-sheet"
-DEFINITELY_VERSION = "480aadc"
+DEFINITELY_VERSION = "8201a5f"
 VERSIONS = [
     {
         "cheatsheet": DEFINITELY_VERSION,
         "react": DEFINITELY_VERSION,
         "react-dom": DEFINITELY_VERSION,
+        "react-dom/server": DEFINITELY_VERSION,
+        "react-dom/test-utils": DEFINITELY_VERSION,
         "react-native": DEFINITELY_VERSION,
     }
 ]
 GROUPS = [
     Group(
-        "React",
+        "react",
         "react",
         DEFINITELY_BASE_URL,
         DEFINITELY_RAW_BASE_URL,
-        [File("types/react/index.d.ts", "react")],
+        [File("types/react/index.d.ts", "react", None)],
     ),
     Group(
-        "React DOM",
+        "react-dom",
         "react-dom",
         DEFINITELY_BASE_URL,
         DEFINITELY_RAW_BASE_URL,
-        [File("types/react-dom/index.d.ts", "react-dom")],
+        [File("types/react-dom/index.d.ts", "react-dom", None)],
     ),
     Group(
-        "React Native",
+        "react-dom/server",
+        "react-dom/server",
+        DEFINITELY_BASE_URL,
+        DEFINITELY_RAW_BASE_URL,
+        [File("types/react-dom/server/index.d.ts", "react-dom-server", None)],
+    ),
+    Group(
+        "react-dom/test-utils",
+        "react-dom/test-utils",
+        DEFINITELY_BASE_URL,
+        DEFINITELY_RAW_BASE_URL,
+        [
+            File(
+                "types/react-dom/test-utils/index.d.ts",
+                "react-dom-test-utils",
+                None,
+            )
+        ],
+    ),
+    Group(
+        "react-native",
         "react-native",
         DEFINITELY_BASE_URL,
         DEFINITELY_RAW_BASE_URL,
-        [File("types/react-native/index.d.ts", "react-native")],
+        [File("types/react-native/index.d.ts", "react-native", None)],
     ),
 ]
 BUILTINS = []
@@ -65,10 +87,9 @@ def write_introduction_paragraph(fout, cheatsheet_version):
         f"{DEFINITELY_BASE_URL}/{cheatsheet_version}</a>. \n",
         "The script to generate this list is \n",
         '<a href="https://github.com/saltycrane/typescript-cheatsheet">on github</a>.\n',
-        "Fixes welcome.\n",
-        "See also my\n",
-        '<a href="/typescript-cheat-sheet/latest/">TypeScript cheat sheet</a>,\n',
-        'and <a href="/blog/2017/08/docker-cheat-sheet/">Docker cheat sheet</a>.\n',
+        "Fixes welcome.</p>\n",
+        "<p>See also my\n",
+        '<a href="/typescript-cheat-sheet/latest/">TypeScript cheat sheet</a>.\n',
         "</p>\n\n",
     ]
     for line in INTRODUCTON_LINES:
